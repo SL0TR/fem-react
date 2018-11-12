@@ -27224,6 +27224,10 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
+var _petfinderClient = _interopRequireWildcard(require("petfinder-client"));
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -27243,6 +27247,11 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var petfinder = (0, _petfinderClient.default)({
+  key: "f036394c4773ee920e321fd57286d373",
+  secret: "6255f5799fa4329e08c500540b71690f"
+});
 
 var SeachParams =
 /*#__PURE__*/
@@ -27265,19 +27274,50 @@ function (_React$Component) {
     return _possibleConstructorReturn(_this, (_temp = _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SeachParams)).call.apply(_getPrototypeOf2, [this].concat(args))), _this.state = {
       location: "Seattle, WA",
       animal: "",
-      breed: ""
+      breed: "",
+      breeds: []
     }, _this.handleLocationChange = function (event) {
       _this.setState({
         location: event.target.value
       });
     }, _this.handleAnimalChange = function (event) {
       _this.setState({
-        animal: event.target.value
+        animal: event.target.value,
+        breed: ""
+      }, _this.getBreeds);
+    }, _this.handleBreedChange = function (event) {
+      _this.setState({
+        breed: event.target.value
       });
     }, _temp));
   }
 
   _createClass(SeachParams, [{
+    key: "getBreeds",
+    value: function getBreeds() {
+      var _this2 = this;
+
+      if (this.state.animal) {
+        petfinder.breed.list({
+          animal: this.state.animal
+        }).then(function (data) {
+          if (data.petfinder && data.petfinder.breeds && Array.isArray(data.petfinder.breeds.breed)) {
+            _this2.setState({
+              breeds: data.petfinder.breeds.breed
+            });
+          } else {
+            _this2.setState({
+              breeds: []
+            });
+          }
+        });
+      } else {
+        this.setState({
+          breeds: []
+        });
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       return _react.default.createElement("div", {
@@ -27290,7 +27330,32 @@ function (_React$Component) {
         id: location,
         value: this.state.location,
         placeholder: "Location"
-      })));
+      })), _react.default.createElement("label", {
+        htmlFor: "animal"
+      }, "Animal", _react.default.createElement("select", {
+        id: "animal",
+        value: this.state.animal,
+        onChange: this.handleAnimalChange,
+        onBlur: this.handleAnimalChange
+      }, _react.default.createElement("option", null), _petfinderClient.ANIMALS.map(function (animal) {
+        return _react.default.createElement("option", {
+          value: animal,
+          key: animal
+        }, animal);
+      }))), _react.default.createElement("label", {
+        htmlFor: "breed"
+      }, "Breed", _react.default.createElement("select", {
+        id: "breed",
+        value: this.state.breed,
+        onChange: this.handleBreedChange,
+        onBlur: this.handleBreedChange,
+        disabled: !this.state.breeds.length
+      }, _react.default.createElement("option", null), this.state.breeds.map(function (breed) {
+        return _react.default.createElement("option", {
+          value: breed,
+          key: breed
+        }, breed);
+      }))), _react.default.createElement("button", null, "Submit"));
     }
   }]);
 
@@ -27299,7 +27364,7 @@ function (_React$Component) {
 
 var _default = SeachParams;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js"}],"App.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","petfinder-client":"../node_modules/petfinder-client/index.js"}],"App.js":[function(require,module,exports) {
 "use strict";
 
 var _react = _interopRequireDefault(require("react"));
@@ -27391,7 +27456,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "7497" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "6294" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
